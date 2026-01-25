@@ -1,0 +1,7 @@
+Metric,Before Cleaning,After Cleaning
+Total Rows,86675,64236
+Total Columns,3,4
+Missing Values,19794,3
+Duplicate Rows,3097,0
+Empty Text Rows,0,0
+Invalid Labels,18914,0

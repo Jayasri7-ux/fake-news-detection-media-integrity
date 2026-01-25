@@ -1,0 +1,9 @@
+flask
+reportlab
+scikit-learn
+langdetect
+pandas
+numpy
+matplotlib
+seaborn
+wordcloud
