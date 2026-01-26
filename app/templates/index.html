@@ -1,351 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Fake News Detection</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Fake News Detection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+ --bg:#f4f6f8;--card:#fff;--text:#222;--muted:#666;
+ --primary:#4f46e5;--fake:#dc2626;--real:#16a34a;--medium:#f59e0b;
+}
+body.dark{
+ --bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;
+}
+body{
+ margin:0;font-family:Segoe UI;background:var(--bg);color:var(--text);
+ display:flex;justify-content:center;padding:30px;
+}
+.container{max-width:760px;width:100%}
+.card{
+ background:var(--card);border-radius:12px;padding:20px;
+ box-shadow:0 10px 25px rgba(0,0,0,.08);margin-bottom:20px;
+}
+.toggle{cursor:pointer;padding:6px 12px;border-radius:20px;
+ background:var(--primary);color:#fff;font-size:14px}
+textarea{
+ width:100%;height:140px;border-radius:8px;border:1px solid #ccc;
+ padding:12px;font-size:15px;resize:none;background:transparent;color:var(--text)
+}
+.btn{background:var(--primary);color:#fff;padding:10px 18px;
+ border:none;border-radius:8px;cursor:pointer}
+.badge{padding:6px 12px;border-radius:20px;color:#fff;font-size:13px}
+.badge.fake{background:var(--fake)}
+.badge.real{background:var(--real)}
+.badge.high{background:var(--fake)}
+.badge.medium{background:var(--medium)}
+.badge.low{background:var(--real)}
+.progress{background:#ddd;height:10px;border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;background:#22c55e;width:0}
+.chart-wrapper{width:280px;height:280px;margin:auto}
+.result{display:none}
+pre{
+ white-space:pre-wrap;
+ background:#f1f1f1;
+ color:#111;
+ padding:12px;
+ border-radius:8px;
+ max-height:220px;
+ overflow:auto;
+}
 
-    <style>
-        :root {
-            --bg: #f4f6f8;
-            --card: #ffffff;
-            --text: #222;
-            --muted: #666;
-            --primary: #4f46e5;
-            --fake: #dc2626;
-            --real: #16a34a;
-        }
+/* ✅ Dark mode fix for extracted text */
+body.dark pre{
+ background:#020617;      /* dark navy */
+ color:#e5e7eb;           /* readable light text */
+ border:1px solid #334155;
+}
 
-        body.dark {
-            --bg: #0f172a;
-            --card: #111827;
-            --text: #e5e7eb;
-            --muted: #9ca3af;
-            --primary: #6366f1;
-        }
-
-        body {
-            margin: 0;
-            font-family: "Segoe UI", sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            padding: 30px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 720px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-
-        .toggle {
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: var(--primary);
-            color: #fff;
-            font-size: 14px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 140px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            padding: 12px;
-            font-size: 15px;
-            resize: none;
-            background: transparent;
-            color: var(--text);
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        .btn.secondary {
-            background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .result {
-            display: none;
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            color: white;
-            font-size: 13px;
-            display: inline-block;
-        }
-
-        .badge.fake { background: var(--fake); }
-        .badge.real { background: var(--real); }
-
-        .meta {
-            font-size: 14px;
-            color: var(--muted);
-            margin-top: 6px;
-        }
-
-        .progress {
-            background: #ddd;
-            height: 10px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 6px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #22c55e, #4ade80);
-            width: 0%;
-        }
-    </style>
+</style>
 </head>
-<body>
 
+<body>
 <div class="container">
 
-    <div class="header">
-        <h1>📰 Fake News Detection</h1>
-        <div class="toggle" onclick="toggleTheme()">🌗 Toggle</div>
-    </div>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h1>📰 Fake News Detection</h1>
+<div class="toggle" onclick="toggleTheme()">🌗 Toggle</div>
+</div>
 
-    <div class="card">
-        <p>Analyze news to determine whether it is <b>Fake</b> or <b>Real</b>, with confidence and risk analysis.</p>
+<div class="card">
+<p>Paste <b>news text</b> or a <b>news article URL</b>.</p>
+<textarea id="newsInput"></textarea><br><br>
+<button class="btn" onclick="analyze()">Analyze</button>
+</div>
 
-        <div class="btn-row">
-            <button class="btn secondary" onclick="setExample('fake')">🧪 Fake Example</button>
-            <button class="btn secondary" onclick="setExample('real')">🧪 Real Example</button>
-        </div>
+<!-- Extracted Content -->
+<div id="extractedCard" class="card" style="display:none">
+<h3>🧾 Extracted News Content</h3>
+<pre id="extractedText"></pre>
+</div>
 
-        <br>
+<div id="resultCard" class="card result">
+<h3>📊 Analysis Result</h3>
 
-        <textarea id="newsInput" placeholder="Paste news or message here..."></textarea>
+<p><b>Prediction:</b> <span id="predictionBadge" class="badge"></span></p>
+<p>Confidence: <span id="confidenceText"></span></p>
+<div class="progress"><div id="confidenceBar" class="progress-fill"></div></div>
 
-        <br><br>
+<p id="modeText"></p>
+<p><b>Risk Level:</b> <span id="riskBadge" class="badge"></span></p>
 
-        <button class="btn" onclick="analyze()">Analyze</button>
-    </div>
+<ul id="explanationList"></ul>
 
-    <div id="resultCard" class="card result">
-        <h3>📊 Analysis Result</h3>
+<h3>🥧 Confidence Distribution</h3>
+<div class="chart-wrapper"><canvas id="confidenceChart"></canvas></div>
 
-        <p>
-            <b>Prediction:</b>
-            <span id="predictionBadge" class="badge">FAKE</span>
-        </p>
-
-        <div class="meta">Confidence: <span id="confidenceText">0%</span></div>
-
-        <div class="progress">
-            <div id="confidenceBar" class="progress-fill"></div>
-        </div>
-
-        <div class="meta" id="modeText"></div>
-        <div class="meta" id="reasonText"></div>
-
-        <hr>
-        <h3>🥧 Prediction Confidence Distribution</h3>
-        <canvas id="confidenceChart" width="300" height="300"></canvas>
-
-        <hr>
-        <h3>📥 Download Results</h3>
-        <div class="btn-row">
-            <button class="btn secondary" onclick="downloadTXT()">Download TXT</button>
-            <button class="btn secondary" onclick="downloadChart()">Download Chart</button>
-            <button class="btn secondary" onclick="downloadPDF()">Download PDF</button>
-        </div>
-    </div>
+<h3>📥 Download</h3>
+<button class="btn" onclick="downloadTXT()">TXT</button>
+<button class="btn" onclick="downloadChart()">Chart</button>
+<button class="btn" onclick="downloadPDF()">PDF</button>
+</div>
 
 </div>
 
 <script>
-    let chart = null;
+let chart=null;
+function toggleTheme(){document.body.classList.toggle("dark")}
+function isURL(t){return t.startsWith("http")}
 
-    function toggleTheme() {
-        document.body.classList.toggle("dark");
-    }
+async function analyze(){
+ const text=document.getElementById("newsInput").value.trim();
+ if(!text) return alert("Enter text or URL");
 
-    function setExample(type) {
-        const textarea = document.getElementById("newsInput");
-        if (type === "fake") {
-            textarea.value = "Breaking: Government confirms aliens have landed secretly.";
-        } else {
-            textarea.value = "The Indian government announced a new digital education policy today.";
-        }
-    }
+ const res=await fetch("/predict",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({text,is_url:isURL(text)})
+ });
 
-    async function analyze() {
-        const text = document.getElementById("newsInput").value.trim();
-        if (!text) {
-            alert("Please enter some text.");
-            return;
-        }
+ const data=await res.json();
+ if(data.error) return alert(data.error);
 
-        const resultCard = document.getElementById("resultCard");
-        const badge = document.getElementById("predictionBadge");
-        const confidenceText = document.getElementById("confidenceText");
-        const confidenceBar = document.getElementById("confidenceBar");
-        const modeText = document.getElementById("modeText");
-        const reasonText = document.getElementById("reasonText");
+ // SHOW EXTRACTED TEXT IF URL
+ if(data.extracted_text){
+  document.getElementById("extractedCard").style.display="block";
+  document.getElementById("extractedText").textContent=data.extracted_text;
+ } else {
+  document.getElementById("extractedCard").style.display="none";
+ }
 
-        resultCard.style.display = "block";
-        badge.textContent = "Analyzing...";
-        badge.className = "badge";
-        confidenceText.textContent = "";
-        confidenceBar.style.width = "0%";
-        modeText.textContent = "Loading...";
-        reasonText.textContent = "";
+ document.getElementById("resultCard").style.display="block";
+ document.getElementById("predictionBadge").textContent=data.prediction;
+ document.getElementById("predictionBadge").className="badge "+(data.prediction==="Fake"?"fake":"real");
 
-        try {
-            const response = await fetch("/predict", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
-            });
+ const conf=Math.round(data.confidence*100);
+ document.getElementById("confidenceText").textContent=conf+"%";
+ document.getElementById("confidenceBar").style.width=conf+"%";
 
-            const data = await response.json();
-            window.lastResult = data;
+ document.getElementById("modeText").textContent="Mode: "+data.mode;
+ document.getElementById("riskBadge").textContent=data.risk_level;
+ document.getElementById("riskBadge").className="badge "+data.risk_level.toLowerCase();
 
-            badge.textContent = data.prediction.toUpperCase();
-            badge.className = "badge " + (data.prediction === "Fake" ? "fake" : "real");
+ const list=document.getElementById("explanationList");
+ list.innerHTML="";
+ (data.explanation||[]).forEach(e=>{
+  const li=document.createElement("li");li.textContent=e;list.appendChild(li)
+ });
 
-            const confidencePercent = Math.round(data.confidence * 100);
-            confidenceText.textContent = confidencePercent + "%";
-            confidenceBar.style.width = confidencePercent + "%";
-
-            modeText.textContent = "Mode: " + data.mode;
-            reasonText.textContent = "Reason: " + data.reason;
-
-            let fakeValue, realValue;
-            if (data.prediction === "Fake") {
-                fakeValue = confidencePercent;
-                realValue = 100 - fakeValue;
-            } else {
-                realValue = confidencePercent;
-                fakeValue = 100 - realValue;
-            }
-
-            const ctx = document.getElementById("confidenceChart").getContext("2d");
-            if (chart) chart.destroy();
-
-            chart = new Chart(ctx, {
-                type: "pie",
-                data: {
-                    labels: ["Real News", "Fake News"],
-                    datasets: [{
-                        data: [realValue, fakeValue],
-                        backgroundColor: ["#16a34a", "#dc2626"]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { position: "bottom" } }
-                }
-            });
-
-        } catch (error) {
-            badge.textContent = "Error";
-            badge.className = "badge fake";
-            modeText.textContent = "Something went wrong.";
-            console.error(error);
-        }
-    }
-
-    function downloadTXT() {
-        if (!window.lastResult) {
-            alert("No result to download.");
-            return;
-        }
-
-        const r = window.lastResult;
-        const content = `
-Fake News Detection Report
--------------------------
-Prediction  : ${r.prediction}
-Confidence  : ${Math.round(r.confidence * 100)} %
-Mode        : ${r.mode}
-Reason      : ${r.reason}
-Date        : ${new Date().toLocaleString()}
-`;
-
-        const blob = new Blob([content], { type: "text/plain" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "fake_news_report.txt";
-        link.click();
-    }
-
-    function downloadChart() {
-        const canvas = document.getElementById("confidenceChart");
-        const link = document.createElement("a");
-        link.download = "confidence_chart.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-    }
-
-    async function downloadPDF() {
-        if (!window.lastResult || !chart) {
-            alert("No result to download.");
-            return;
-        }
-
-        const canvas = document.getElementById("confidenceChart");
-        const chartImage = canvas.toDataURL("image/png");
-
-        const payload = {
-            ...window.lastResult,
-            chart: chartImage
-        };
-
-        const response = await fetch("/download-pdf", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "fake_news_report.pdf";
-        link.click();
-    }
+ const ctx=document.getElementById("confidenceChart");
+ if(chart) chart.destroy();
+ chart=new Chart(ctx,{
+  type:"pie",
+  data:{labels:["Real","Fake"],
+  datasets:[{data:[conf,100-conf],backgroundColor:["#16a34a","#dc2626"]}]},
+  options:{maintainAspectRatio:false}
+ });
+}
 </script>
-
 </body>
 </html>
