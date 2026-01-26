@@ -1,9 +1,30 @@
-flask
-reportlab
+# Core web framework
+Flask
+
+# ML & data processing
 scikit-learn
-langdetect
 pandas
 numpy
+
+# Language & text processing
+langdetect
+nltk
+
+# Visualization
 matplotlib
 seaborn
 wordcloud
+
+# PDF generation
+reportlab
+
+# URL / news article extraction
+newspaper3k
+beautifulsoup4
+requests
+lxml
+lxml_html_clean
+
+# Optional but recommended (used internally by newspaper3k)
+tldextract
+feedparser
