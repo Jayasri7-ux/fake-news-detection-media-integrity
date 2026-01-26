@@ -77,6 +77,18 @@ The Flask app allows users to input news text and receive predictions indicating
 
 ## ▶️ How to Run the Project
 
+### Step 1: Clone the repository
 ```bash
+git clone https://github.com/<your-username>/fake_news_detection_media_integrity.git
+cd fake_news_detection_media_integrity
+Step 2: Create and activate virtual environment (Windows)
+python -m venv fake-news-env
+fake-news-env\Scripts\activate
+Step 3: Install required dependencies
 pip install -r requirements.txt
-python app/app.py
+Step 4: Run the Flask application
+cd app
+python app.py
+Step 5: Open the application in browser
+http://127.0.0.1:5000/
+
