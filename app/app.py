@@ -14,7 +14,6 @@ from bs4 import BeautifulSoup
 
 # Ensure project root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from src.inference.predictor import FakeNewsPredictor
 
 app = Flask(__name__)
@@ -76,7 +75,6 @@ def predict_api():
 
             result = predictor.predict(extracted_text)
 
-            # ✅ IMPORTANT: send extracted_text back
             response = {
                 "prediction": result.get("prediction"),
                 "confidence": result.get("confidence"),
@@ -85,7 +83,7 @@ def predict_api():
                 "risk_level": result.get("risk_level"),
                 "explanation": result.get("explanation"),
                 "keywords": result.get("keywords"),
-                "extracted_text": extracted_text
+                "extracted_text": extracted_text   # ✅ this enables UI display
             }
 
         # -------- TEXT INPUT --------
