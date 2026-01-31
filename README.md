@@ -19,6 +19,9 @@ The system performs:
 - Web-based prediction using Flask
 
 ---
+## 📂 Project Resources
+- 🎥 [Demo Video] (https://drive.google.com/file/d/1NF2-Ve5NvLc_uw0y0kTO8vVb2_3cgvO3/view?usp=sharing)
+- 🎥 [Demo Video] (https://drive.google.com/file/d/1G2DRAC7bHy46bVpic5-El8uweLD8AR3W/view?usp=sharing)
 
 ## 🧰 Technologies Used
 
