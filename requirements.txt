@@ -28,3 +28,4 @@ lxml_html_clean
 # Optional but recommended (used internally by newspaper3k)
 tldextract
 feedparser
+gunicorn
