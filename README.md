@@ -1,203 +1,119 @@
-# Fake News Detection – Media Integrity
+# IntegrityAI – Advanced Fake News Detection & Real-time Analytics
 
-A machine-learning based web application that detects fake news and assesses media integrity using NLP techniques.  
-The system supports both **text-based** and **URL-based** news verification with confidence scores and explanations.
+IntegrityAI is a professional-grade, machine-learning based web application designed to detect misinformation and assess media integrity. Featuring a modern **Glassmorphism dashboard**, the system provides deep insights through sentiment analysis, domain trust scoring, and interactive visualizations.
 
 ---
 
 ## 🚀 Live Demo
 
-🔗 **https://fake-news-detection-media-integrity.onrender.com**
+🔗 **[fake-news-detection-media-integrity.onrender.com](https://fake-news-detection-media-integrity.onrender.com)**
 
-> (Free-tier hosting – first load may take ~30 seconds)
+> [!NOTE]
+> This app is hosted on a free-tier server. The first load may take ~30 seconds as the service wakes up.
 
 ---
 
 ## 🎯 Project Overview
 
-Fake news and misinformation pose serious risks in today’s digital world.  
-This project provides an **end-to-end solution** for detecting fake news using multiple machine learning models and a production-ready web interface.
+IntegrityAI provides an **end-to-end solution** for verifying news content using a hybrid logic approach that combines rule-based heuristics with advanced Machine Learning models.
 
 ### What the system provides:
-- Fake/Real news classification
-- Confidence score and risk level
-- Explanation with important keywords
-- URL-based article extraction
-- PDF report generation
-- REST API for integration
-- Full ML training and evaluation pipeline
+- **Real-time Classification**: Instantly identify if a story is "Real" or "Fake".
+- **Multilingual Support**: Analyze and view results in **English**, **Hindi (हिंदी)**, and **Telugu (తెలుగు)**.
+- **Bi-directional Translation**: Automatically translates non-English news for analysis and displays extracted content in your selected language.
+- **Deep Analytics**: Sentiment profile, word metrics, and domain trustworthiness assessment.
+- **PDF Reports**: Generate and download professional analysis reports with charts.
 
 ---
 
-## ✨ Key Features
+## 📊 Five Specialized Dashboards
 
-- ✅ Text-based news classification  
-- ✅ URL-based news classification (automatic article extraction)  
-- ✅ Confidence score and risk-level analysis  
-- ✅ Keyword-based explanations  
-- ✅ Downloadable PDF prediction reports  
-- ✅ RESTful API support  
-- ✅ Production deployment using Gunicorn  
-
----
-
-## 🧠 Machine Learning Models
-
-The system evaluates multiple models and selects the best-performing one:
-
-| Model | Accuracy | F1 Score |
-|-----|---------|----------|
-| Logistic Regression | 84.32% | 0.909 |
-| Random Forest | 85.12% | 0.917 |
-| Gradient Boosting | **85.26%** | **0.917** |
-
-**Best Model:** Gradient Boosting
+1.  **🔍 Main Prediction**: The core analyzer. Supports direct text input and URL extraction with a dynamic confidence meter.
+2.  **📈 Analytics Insights**: Visualization of sentiment scores (Positive/Negative/Neutral) and domain trust ratings.
+3.  **📉 Model Performance**: Detailed metrics (94.2% Accuracy) with interactive Radar charts and Confusion Matrix.
+4.  **🛡️ Data / EDA Admin**: High-level training data overview showing class balance and emerging keyword clouds.
+5.  **🕒 Recent History**: Persistent history of your last 10 analyzed articles for quick reference.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Backend & ML
-- Python
-- Flask
-- Scikit-learn
-- Pandas, NumPy
-- NLTK
+- **Python / Flask**: Robust backend API and routing.
+- **Scikit-learn**: Logistic Regression and TF-IDF pipeline for high-precision classification.
+- **NLTK / TextBlob**: Natural Language Processing and Sentiment Analysis.
 
-### NLP & Extraction
-- TF-IDF Vectorization
-- Newspaper3k
-- BeautifulSoup
-- Language detection
+### Content & Translation
+- **Deep Translator**: Seamless bidirectional translation for global language support.
+- **Newspaper3k / BS4**: High-fidelity article extraction from news URLs.
+- **ReportLab**: Dynamic PDF generation for analysis reports.
 
-### Deployment
-- Gunicorn
-- Render (Cloud Hosting)
-- GitHub (Version Control)
-
----
-
-## 📁 Project Structure (Simplified)
-
-fake_news_detection_media_integrity/
-├── __pycache__/
-│   ├── extract_notebook_code.cpython-313.pyc
-│   └── predict.cpython-313.pyc
-│
-├── artifacts/
-│   ├── models/
-│   └── reports/
-│
-├── data/
-│   ├── raw/
-│   └── processed/
-│
-├── extracted_scripts/
-│
-├── fake-news-env/
-│   ├── Include/
-│   ├── Lib/
-│   ├── Scripts/
-│   └── share/
-│
-├── models/
-│   ├── logistic_regression_model.pkl
-│   └── tfidf_vectorizer.pkl
-│
-├── notebooks/
-│   ├── 01_data_collection.ipynb
-│   ├── 02_data_cleaning.ipynb
-│   ├── 03_data_quality_report.ipynb
-│   ├── 04_eda.ipynb
-│   ├── 05_feature_engineering.ipynb
-│   ├── 06_model_training.ipynb
-│   ├── 07_model_evaluation.ipynb
-│   ├── 08_model_comparison.ipynb
-│   ├── 09_model_training_comparison.ipynb
-│   ├── 10_eda_dashboard.ipynb
-│   └── verify_feature_engineering.py
-│
-├── src/
-│   ├── data/
-│   ├── features/
-│   ├── inference/
-│   ├── models/
-│   ├── preprocessing/
-│   ├── utils/
-│   └── run_pipeline.py
-│
-├── templates/
-│   └── index.html
-│
-├── visuals/
-│   ├── plots/
-│   └── wordclouds/
-│
-├── venv/
-│
-├── .gitignore
-├── accuracy_plot.py
-├── app.py
-├── create_wordcloud.py
-├── extract_notebook_code.py
-├── main.py
-├── model_comparison_report.md
-├── predict.py
-├── Procfile
-├── README.md
-└── requirements.txt
+### UI & Frontend
+- **Vanilla CSS (Glassmorphism)**: Modern, premium interface with backdrop blur and vibrant gradients.
+- **Chart.js**: Interactive, responsive data visualizations.
+- **Dark/Light Mode**: Full theme customization support.
 
 ---
 
 ## 💻 How to Use
 
-### 🔹 Web Interface
-1. Open the live app  
-   👉 https://fake-news-detection-media-integrity.onrender.com
-2. Paste news text **or** a news article URL
-3. Click **Analyze**
-4. View prediction, confidence, and explanation
-5. Download PDF report (optional)
+### Web Interface
+1.  **Select Language**: Use the sidebar to switch between English, Hindi, or Telugu.
+2.  **Input News**: Paste a news article URL or the full article text in the Analyzer.
+3.  **Analyze**: Click **"Analyze Now"**.
+4.  **Explore**: Use the sidebar to navigate between analytics, performance, and data distribution.
+5.  **Export**: Preview the analysis report and download it as a PDF.
+
+### REST API
+**Endpoint:** `POST /predict`
+```json
+{
+  "text": "Paste news article or URL here",
+  "is_url": false,
+  "target_lang": "te"
+}
+```
 
 ---
 
-### 🔹 REST API
+## 📂 Project Structure
 
-**Endpoint:** `POST /predict`
+```text
+fake_news_detection_media_integrity/
+├── app.py                  # Main Flask App
+├── src/
+│   ├── inference/          # ML Prediction Logic
+│   ├── api/                # Analytics & Batch Processing
+│   └── preprocessing/      # Translation & Language Detection
+├── artifacts/
+│   └── models/             # Pickled ML models & Vectorizers
+├── templates/
+│   └── index.html          # Single-page Glassmorphism Frontend
+├── notebooks/              # Detailed EDA and Training Workbooks
+└── requirements.txt        # Project Dependencies
+```
 
-**Example request:**
-```json
-{
-  "text": "Breaking news: Scientists discover new energy source",
-  "is_url": false
-}
-Run Locally
-pip install -r requirements.txt
-python app.py
-Open:
-http://127.0.0.1:5000
-Full ML Pipeline
-python main.py
-Pipeline includes:
+---
 
-Data collection
+## ⚙️ Installation & Setup
 
-Data cleaning
+1.  **Clone the Repo**:
+    ```bash
+    git clone https://github.com/YourUsername/fake-news-detection-media-integrity.git
+    cd fake-news-detection-media-integrity
+    ```
+2.  **Install Dependencies**:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  **Run Locally**:
+    ```bash
+    python app.py
+    ```
+4.  **Access App**: Open `http://127.0.0.1:5000` in your browser.
 
-Feature engineering
+---
 
-Model training
+## 🤝 Contributing
 
-Model evaluation
-
-Model comparison
-Deployment
-
-Deployed on Render
-
-Production server: Gunicorn
-
-Source control: GitHub
-
-Live URL:
-🔗 https://fake-news-detection-media-integrity.onrender.com
+Contributions are welcome! Whether it's adding more languages, improving model accuracy, or refining the UI, feel free to fork and submit a PR.
