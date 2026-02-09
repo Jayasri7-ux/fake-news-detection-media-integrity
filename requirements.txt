@@ -29,3 +29,10 @@ lxml_html_clean
 tldextract
 feedparser
 gunicorn
+
+# New requirements for translation and analytics
+deep-translator
+textblob
+
+
+
