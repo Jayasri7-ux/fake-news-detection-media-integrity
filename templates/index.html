@@ -3,544 +3,1136 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Fake News Detection AI</title>
+    <title>IntegrityAI | Professional Fake News Detection</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Premium Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <style>
         :root {
-            --bg: #f8fafc;
-            --card: rgba(255, 255, 255, 0.8);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --text: #1e293b;
-            --muted: #64748b;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --fake: #ef4444;
-            --real: #22c55e;
-            --medium: #f59e0b;
-            --glass-blur: 12px;
+            --bg: #0f172a;
+            --sidebar-bg: rgba(15, 23, 42, 0.95);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-secondary: #a855f7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --glass-blur: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body.dark {
-            --bg: #0f172a;
-            --card: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.05);
-            --text: #f1f5f9;
-            --muted: #94a3b8;
+        body.light {
+            --bg: #f8fafc;
+            --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(0, 0, 0, 0.05);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
             font-family: 'Inter', sans-serif;
             background: var(--bg);
-            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%),
-                radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.1) 0, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.1) 0, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
+            color: var(--text-primary);
             min-height: 100vh;
-            transition: background-color 0.3s ease;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
         }
 
-        .container {
-            max-width: 800px;
-            width: 100%;
-        }
-
-        .card {
-            background: var(--card);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            margin-bottom: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
-        }
-
-        .header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            letter-spacing: -0.025em;
-            margin: 0;
-            font-size: 2rem;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
+        /* --- Background Animations --- */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border-right: 1px solid var(--card-border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .toggle {
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 99px;
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            font-size: 14px;
-            font-weight: 500;
+            margin-bottom: 40px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
+            gap: 10px;
         }
 
-        .toggle:hover {
-            background: var(--primary);
-            color: white;
+        .nav-list {
+            list-style: none;
+            flex-grow: 1;
         }
 
-        textarea {
-            width: 100%;
-            height: 160px;
+        .nav-item {
+            padding: 12px 18px;
             border-radius: 12px;
-            border: 1px solid var(--card-border);
-            padding: 16px;
-            font-family: inherit;
-            font-size: 15px;
-            resize: none;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            outline: none;
-            transition: border-color 0.2s;
-            box-sizing: border-box;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
-        textarea:focus {
-            border-color: var(--primary);
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            max-width: 1400px;
+            margin-right: auto;
+        }
+
+        /* --- Landing Page / Hero --- */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 60px 0;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 20px;
         }
 
         .btn {
-            background: var(--primary);
-            color: #fff;
-            padding: 12px 24px;
-            border: none;
+            padding: 14px 28px;
             border-radius: 12px;
-            cursor: pointer;
             font-weight: 600;
-            font-size: 15px;
-            transition: all 0.2s;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
         }
 
-        .btn:hover {
-            background: var(--primary-hover);
-            transform: scale(1.02);
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+        }
+
+        /* --- Boards --- */
+        .board {
+            display: none;
+        }
+
+        .board.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        /* --- Analyzer Specific --- */
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* --- Results Panel --- */
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .badge {
             padding: 6px 14px;
             border-radius: 99px;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
 
-        .badge.fake {
-            background: var(--fake);
+        .badge-real {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
         }
 
-        .badge.real {
-            background: var(--real);
+        .badge-fake {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
         }
 
-        .badge.high {
-            background: var(--fake);
-        }
-
-        .badge.medium {
-            background: var(--medium);
-        }
-
-        .badge.low {
-            background: var(--real);
-        }
-
-        .progress-container {
-            background: rgba(0, 0, 0, 0.05);
-            height: 12px;
-            border-radius: 99px;
+        .meter-container {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
             overflow: hidden;
-            margin: 15px 0;
+            margin: 20px 0;
         }
 
-        .progress-fill {
+        .meter-fill {
             height: 100%;
-            background: linear-gradient(90deg, #6366f1, #a855f7);
-            width: 0;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            width: 0%;
+            transition: width 1s ease;
         }
 
-        .chart-wrapper {
+        /* --- Charts --- */
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        /* --- Report Preview Modal --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 400px;
-            height: 300px;
-            margin: 20px auto;
-        }
-
-        .keyword-tag {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary);
-            border-radius: 8px;
-            margin-right: 8px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .summary-box {
-            background: rgba(99, 102, 241, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 16px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-style: italic;
-        }
-
-        /* Skeleton Loading */
-        .skeleton {
-            background: linear-gradient(90deg, var(--card-border) 25%, rgba(0, 0, 0, 0.05) 50%, var(--card-border) 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 8px;
-        }
-
-        @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        pre {
-            white-space: pre-wrap;
-            background: rgba(0, 0, 0, 0.03);
-            color: var(--text);
-            padding: 16px;
-            border-radius: 12px;
-            max-height: 250px;
-            overflow: auto;
-            font-family: inherit;
-            font-size: 14px;
-            border: 1px solid var(--card-border);
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .history-item {
-            padding: 12px 16px;
-            border-radius: 12px;
-            background: rgba(0, 0, 0, 0.02);
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
             align-items: center;
-            transition: all 0.2s;
+            z-index: 1000;
         }
 
-        .history-item:hover {
-            background: rgba(99, 102, 241, 0.08);
-            transform: translateX(4px);
+        .modal-content {
+            background: var(--bg);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            border-radius: 24px;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                padding: 30px 10px;
+            }
+
+            .sidebar span {
+                display: none;
+            }
+
+            .logo {
+                justify-content: center;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="bg-glow"></div>
 
-        <!-- Header -->
-        <div class="header-flex">
-            <h1>📰 Fake News Detection</h1>
-            <div class="toggle" onclick="toggleTheme()">🌗 Mode</div>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 4L4 10V22L16 28L28 22V10L16 4Z" stroke="url(#paint0_linear)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                <defs>
+                    <linearGradient id="paint0_linear" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#6366f1" />
+                        <stop offset="1" stop-color="#a855f7" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span>IntegrityAI</span>
         </div>
 
-        <!-- Input -->
-        <div class="card">
-            <p style="margin-top:0">Analyze news <b>text</b> or a <b>URL</b> to detect authenticity.</p>
-            <textarea id="newsInput" placeholder="Paste content here..."></textarea>
-            <div style="margin-top:20px; text-align:right">
-                <button class="btn" id="analyzeBtn" onclick="analyze()">
-                    <span>Analyze Content</span>
-                </button>
-            </div>
+        <!-- Language Selector -->
+        <div style="margin-bottom: 20px; padding: 0 10px;">
+            <select id="langSelect" onchange="changeLanguage()"
+                style="width: 100%; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--card-border); outline: none;">
+                <option value="en">🇺🇸 English</option>
+                <option value="hi">🇮🇳 Hindi (हिंदी)</option>
+                <option value="te">🇮🇳 Telugu (తెలుగు)</option>
+            </select>
         </div>
+        <ul class="nav-list">
+            <li class="nav-item active" onclick="switchBoard('home', event)">🏠 <span>Home</span></li>
+            <li class="nav-item" onclick="switchBoard('analyzer', event)">🔍 <span>Main Prediction</span></li>
+            <li class="nav-item" onclick="switchBoard('analytics', event)">📊 <span>Analytics Insights</span></li>
+            <li class="nav-item" onclick="switchBoard('performance', event)">📈 <span>Model Performance</span></li>
+            <li class="nav-item" onclick="switchBoard('admin', event)">🛡️ <span>Data / EDA Admin</span></li>
+            <li class="nav-item" onclick="switchBoard('history', event)">🕒 <span>Recent History</span></li>
+        </ul>
+        <div class="nav-item" onclick="toggleTheme()" style="margin-top:auto">🌓 <span id="nav_theme">Toggle
+                Theme</span></div>
+    </nav>
 
-        <!-- Loading Skeleton (Hidden by default) -->
-        <div id="loadingCard" class="card" style="display:none">
-            <div class="skeleton" style="height:24px; width:60%; margin-bottom:20px"></div>
-            <div class="skeleton" style="height:100px; margin-bottom:20px"></div>
-            <div class="skeleton" style="height:20px; width:40%"></div>
-        </div>
+    <!-- Main Content -->
+    <main class="main-content">
 
-        <!-- History Panel -->
-        <div class="card">
-            <h3 style="margin-top:0">🕒 Recent Analyses</h3>
-            <div id="historyList" class="history-list">
-                <div style="color:var(--muted); font-size:14px">Processing your history...</div>
-            </div>
-        </div>
-
-        <!-- Extracted Content -->
-        <div id="extractedCard" class="card" style="display:none">
-            <h3>🧾 Extracted News Content</h3>
-            <pre id="extractedText"></pre>
-        </div>
-
-        <!-- Results -->
-        <div id="resultCard" class="card result">
-            <div style="display:flex; justify-content:space-between; align-items:start">
-                <h3 style="margin:0">📊 Analysis Result</h3>
-                <span id="predictionBadge" class="badge"></span>
-            </div>
-
-            <div class="summary-box" id="summaryContainer" style="display:none">
-                <p id="summaryText" style="margin:0"></p>
-            </div>
-
-            <div style="margin-top:20px">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px">
-                    <span style="font-size:14px; font-weight:500">Confidence Score</span>
-                    <span id="confidenceText" style="font-size:14px; font-weight:700"></span>
-                </div>
-                <div class="progress-container">
-                    <div id="confidenceBar" class="progress-fill"></div>
+        <!-- HOME BOARD -->
+        <section id="home-board" class="board active">
+            <div class="hero">
+                <h1 id="hero_title">Stop Fake News<br>with <span style="color:var(--accent-primary)">Smart AI</span>
+                </h1>
+                <p id="hero_desc">IntegrityAI helps you find out if a news story is true or false. Just paste a link or
+                    some text, and
+                    our smart tool will check it for you instantly.</p>
+                <div class="cta-group">
+                    <button class="btn btn-primary" onclick="switchBoard('analyzer', event)" id="btn_check_now">Check
+                        News Now</button>
+                    <button class="btn btn-secondary" onclick="switchBoard('performance', event)" id="btn_see_works">See
+                        How It
+                        Works</button>
                 </div>
             </div>
 
-            <div style="display:flex; gap:20px; margin:20px 0; font-size:14px">
-                <div><b>Mode:</b> <span id="modeText" style="color:var(--primary)"></span></div>
-                <div><b>Risk:</b> <span id="riskBadge" class="badge" style="padding:2px 10px; font-size:11px"></span>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <span class="stat-label" id="lbl_precision">Model Precision</span>
+                    <span class="stat-value">93.5%</span>
+                </div>
+                <div class="card">
+                    <span class="stat-label" id="lbl_analyzed">Analyzed Articles</span>
+                    <span class="stat-value">1.2M+</span>
+                </div>
+                <div class="card">
+                    <span class="stat-label" id="lbl_verified">Data Points Source</span>
+                    <span class="stat-value" id="val_verified">Verified</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANALYZER BOARD -->
+        <section id="analyzer-board" class="board">
+            <h2 id="hdr_analyzer">Real-time News Analysis</h2>
+            <div class="card" style="margin-top:20px">
+                <textarea id="newsInput"
+                    placeholder="Paste news article text or link (https://...) here for instant verification..."></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <span id="charCount" style="color:var(--text-secondary); font-size:0.9rem">0 characters</span>
+                    <button class="btn btn-primary" id="analyzeBtn" onclick="runAnalysis()">
+                        <span id="btnText">Analyze Now</span>
+                    </button>
                 </div>
             </div>
 
-            <div id="keywordsContainer" style="margin:20px 0; display:none">
-                <h4 style="margin-bottom:10px; font-size:14px">Key Findings</h4>
-                <div id="keywordsList"></div>
+            <div id="loadingState" style="display:none; text-align:center; padding:40px">
+                <div class="loading-spinner"
+                    style="border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent-primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;">
+                </div>
+                <p id="loadingText">AI is processing the content. Please wait...</p>
             </div>
 
-            <h4 style="margin-bottom:10px; font-size:14px">Detailed Points</h4>
-            <ul id="explanationList" style="margin:0; padding-left:20px; font-size:14px; line-height:1.6"></ul>
+            <div id="resultsContainer" style="display:none; margin-top:30px">
+                <!-- Timestamps Row -->
+                <div
+                    style="margin-bottom:15px; font-size:0.85rem; color:var(--text-secondary); display:flex; justify-content:space-between;">
+                    <span id="resTimestamp">Checked on: -</span>
+                    <span id="resLanguageLabel">Language: English</span>
+                </div>
 
-            <div style="margin-top:30px">
-                <h3 style="margin-bottom:15px">🥧 Visual Distribution</h3>
-                <div class="chart-wrapper"><canvas id="confidenceChart"></canvas></div>
+                <!-- Extracted Content Section -->
+                <div id="extractedSection" class="card" style="margin-bottom:25px; display:none">
+                    <h3 id="hdr_extracted">🧾 Extracted Content</h3>
+                    <div id="extractedTextDisplay"
+                        style="margin-top:15px; background:rgba(0,0,0,0.1); padding:20px; border-radius:12px; font-size:0.95rem; line-height:1.6; max-height:300px; overflow-y:auto; border:1px solid var(--card-border)">
+                        <!-- Text here -->
+                    </div>
+                </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                    <div class="card">
+                        <div class="result-header">
+                            <h3 id="hdr_summary">Analysis Summary</h3>
+                            <span id="resBadge" class="badge">FAKE</span>
+                        </div>
+                        <p id="resReason" style="font-size:1.1rem; line-height:1.6; margin-bottom:20px"></p>
+
+                        <!-- Feedback System -->
+                        <div id="feedbackBox"
+                            style="margin-bottom:20px; padding:15px; background:rgba(255,255,255,0.03); border-radius:12px; border:1px solid var(--card-border);">
+                            <p id="lbl_feedback" style="font-size:0.9rem; margin-bottom:10px;">Was this analysis
+                                accurate?</p>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-secondary" style="padding:8px 15px; font-size:0.85rem;"
+                                    onclick="submitFeedback(true)" id="btn_yes">👍 Yes</button>
+                                <button class="btn btn-secondary" style="padding:8px 15px; font-size:0.85rem;"
+                                    onclick="submitFeedback(false)" id="btn_no">👎 No</button>
+                            </div>
+                            <p id="feedbackThanks"
+                                style="display:none; color:var(--success); font-size:0.85rem; margin-top:10px;">Thanks
+                                for your feedback!</p>
+                        </div>
+
+                        <div class="meter-container">
+                            <div id="resMeter" class="meter-fill"></div>
+                        </div>
+                        <div
+                            style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--text-secondary)">
+                            <span id="lbl_conf">Confidence Score</span>
+                            <span id="resConfText" style="font-weight:700; color:var(--text-primary)">85%</span>
+                        </div>
+
+                        <div style="margin-top:30px; display:flex; gap:15px">
+                            <button class="btn btn-secondary" onclick="previewReport()" id="btn_preview">👁️ Preview
+                                Report</button>
+                            <button class="btn btn-secondary" onclick="downloadReport()" id="btn_download">📥 Download
+                                PDF</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 id="hdr_risk">Risk Indicators</h3>
+                        <ul id="resExplanation" style="list-style:none; margin-top:15px">
+                            <!-- JS dynamic -->
+                        </ul>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div style="margin-top:30px; display:flex; gap:10px; flex-wrap:wrap">
-                <button class="btn" style="background:rgba(0,0,0,0.05); color:var(--text)" onclick="downloadTXT()">📄
-                    TXT</button>
-                <button class="btn" style="background:rgba(0,0,0,0.05); color:var(--text)" onclick="downloadChart()">🖼️
-                    PNG</button>
-                <button class="btn" onclick="downloadPDF()">📥 Export PDF Report</button>
+        <!-- HISTORY BOARD -->
+        <section id="history-board" class="board">
+            <div class="card">
+                <h3 id="hdr_history">🕒 Recent History</h3>
+                <p id="desc_history" style="color:var(--text-secondary); margin-bottom:20px;">Your last 10 news checks
+                    are saved here.</p>
+                <div id="historyList" style="display:flex; flex-direction:column; gap:15px;">
+                    <p id="empty_history" style="color:var(--text-secondary); font-size:0.9rem;">No history yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANALYTICS BOARD -->
+        <section id="analytics-board" class="board">
+            <h2 id="hdr_analytics">Analytics Insights</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="hdr_sentiment">Sentiment Profile</h3>
+                    <div class="chart-container"><canvas id="sentimentChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 id="hdr_trust">Domain Trustworthiness</h3>
+                    <div class="chart-container"><canvas id="trustChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 id="hdr_readability">Readability Metrics</h3>
+                    <div id="readabilityStats" style="margin-top:20px">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+                            <span id="lbl_wordcount">Word Count</span>
+                            <b id="wordCount">-</b>
+                        </div>
+                        <div style="display:flex; justify-content:space-between">
+                            <span id="lbl_avglen">Avg Word Length</span>
+                            <b id="avgWordLen">-</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PERFORMANCE BOARD -->
+        <section id="performance-board" class="board">
+            <h2 id="hdr_performance">Model Performance Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="hdr_global">Global Metrics</h3>
+                    <div class="chart-container"><canvas id="perfMetricsChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 id="hdr_confusion">Confusion Matrix</h3>
+                    <div
+                        style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; text-align:center; margin-top:20px">
+                        <div style="background:rgba(0,0,0,0.1); padding:15px; border-radius:10px">
+                            <small id="lbl_tr">True Real</small><br><b id="tp_val" style="color:var(--success)">-</b>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.1); padding:15px; border-radius:10px">
+                            <small id="lbl_ff">False Fake</small><br><b id="fp_val" style="color:var(--danger)">-</b>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.1); padding:15px; border-radius:10px">
+                            <small id="lbl_fr">False Real</small><br><b id="fn_val" style="color:var(--danger)">-</b>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.1); padding:15px; border-radius:10px">
+                            <small id="lbl_tf">True Fake</small><br><b id="tn_val" style="color:var(--success)">-</b>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 id="hdr_arch">Model Architecture</h3>
+                    <p id="desc_arch" style="color:var(--text-secondary); margin-top:10px">IntegrityAI V2.0 leverages a
+                        stack of
+                        TF-IDF, PassiveAggressive, and Logistic Regression with custom semantic weights.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN / EDA BOARD -->
+        <section id="admin-board" class="board">
+            <h2 id="hdr_admin">Platform Data / EDA Admin</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 id="hdr_balance">Training Data Balance</h3>
+                    <div class="chart-container"><canvas id="distChart"></canvas></div>
+                </div>
+                <div class="card" style="grid-column: span 2">
+                    <h3 id="hdr_keywords">Top Emerging Keywords</h3>
+                    <div id="keywordCloud" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px">
+                        <!-- JS dynamic -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Report Preview Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Analysis Report Preview</h2>
+            <div id="modalBody"
+                style="margin-top:20px; border:1px solid var(--card-border); padding:30px; border-radius:16px;">
+                <!-- HTML Preview -->
+            </div>
+            <div style="margin-top:30px; text-align:right">
+                <button class="btn btn-primary" onclick="downloadReport()" id="btn_dl_modal">Download PDF</button>
             </div>
         </div>
-
     </div>
 
     <script>
-        let chart = null;
-        function toggleTheme() { document.body.classList.toggle("dark") }
-        function isURL(t) { return t.startsWith("http") }
+        // --- State Management ---
+        let globalData = null;
+        let charts = {};
+        const translations = {
+            en: {
+                hero_title: "Stop Fake News<br>with <span style='color:var(--accent-primary)'>Smart AI</span>",
+                hero_desc: "IntegrityAI helps you find out if a news story is true or false. Just paste a link or some text, and our smart tool will check it for you instantly.",
+                nav_home: "Home", nav_analyzer: "Main Prediction", nav_analytics: "Analytics Insights", nav_perf: "Model Performance", nav_admin: "Data / EDA Admin", nav_history: "Recent History",
+                nav_theme: "Toggle Theme",
+                check_now: "Check News Now", see_works: "See How It Works",
+                lbl_precision: "Model Precision", lbl_analyzed: "Analyzed Articles", lbl_verified: "Data Points Source", val_verified: "Verified",
+                hdr_analyzer: "Real-time News Analysis", news_placeholder: "Paste news article text or link (https://...) here for instant verification...",
+                lbl_charcount: "characters", btn_analyze: "Analyze Now", loading_text: "AI is processing the content. Please wait...",
+                res_checked_on: "Checked on:", res_lang_label: "Language: English",
+                hdr_extracted: "🧾 Extracted Content", hdr_summary: "Analysis Summary", lbl_conf: "Confidence Score",
+                btn_preview: "👁️ Preview Report", btn_download: "📥 Download PDF", btn_dl_modal: "Download PDF",
+                hdr_risk: "Risk Indicators", lbl_feedback: "Was this analysis accurate?", btn_yes: "👍 Yes", btn_no: "👎 No", feedback_thanks: "Thanks for your feedback!",
+                hdr_history: "🕒 Recent History", desc_history: "Your last 10 news checks are saved here.", empty_history: "No history yet.",
+                hdr_analytics: "Analytics Insights", hdr_sentiment: "Sentiment Profile", hdr_trust: "Domain Trustworthiness", hdr_readability: "Readability Metrics", lbl_wordcount: "Word Count", lbl_avglen: "Avg Word Length",
+                hdr_performance: "Model Performance Dashboard", hdr_global: "Global Metrics", hdr_confusion: "Confusion Matrix", hdr_arch: "Model Architecture",
+                lbl_tr: "True Real", lbl_ff: "False Fake", lbl_fr: "False Real", lbl_tf: "True Fake",
+                desc_arch: "IntegrityAI V2.0 leverages a stack of TF-IDF, PassiveAggressive, and Logistic Regression with custom semantic weights.",
+                hdr_admin: "Platform Data / EDA Admin", hdr_balance: "Training Data Balance", hdr_keywords: "Top Emerging Keywords",
+                modal_title: "Analysis Report Preview"
+            },
+            hi: {
+                hero_title: "फर्जी खबरों को रोकें<br><span style='color:var(--accent-primary)'>स्मार्ट AI</span> के साथ",
+                hero_desc: "IntegrityAI आपको यह पता लगाने में मदद करता है कि कोई खबर सच्ची है या झूठी। बस एक लिंक या कुछ टेक्स्ट पेस्ट करें, और हमारा स्मार्ट टूल तुरंत इसकी जांच करेगा।",
+                nav_home: "मुख्य पृष्ठ", nav_analyzer: "मुख्य भविष्यवाणी", nav_analytics: "विश्लेषण अंतर्दृष्टि", nav_perf: "मॉडल प्रदर्शन", nav_admin: "डेटा एडमिन", nav_history: "हाल का इतिहास",
+                nav_theme: "थीम बदलें",
+                check_now: "अभी जांचें", see_works: "देखें यह कैसे काम करता है",
+                lbl_precision: "मॉडल सटीकता", lbl_analyzed: "विश्लेषित लेख", lbl_verified: "डेटा बिंदु स्रोत", val_verified: "सत्यापित",
+                hdr_analyzer: "वास्तविक समय समाचार विश्लेषण", news_placeholder: "त्वरित सत्यापन के लिए यहां समाचार लेख टेक्स्ट या लिंक (https://...) पेस्ट करें...",
+                lbl_charcount: "वर्ण", btn_analyze: "अभी विश्लेषण करें", loading_text: "एआई सामग्री को प्रोसेस कर रहा है। कृपया प्रतीक्षा करें...",
+                res_checked_on: "जाँच की गई:", res_lang_label: "भाषा: हिंदी",
+                hdr_extracted: "🧾 निष्कर्षित सामग्री", hdr_summary: "विश्लेषण सारांश", lbl_conf: "आत्मविश्वास स्कोर",
+                btn_preview: "👁️ रिपोर्ट पूर्वावलोकन", btn_download: "📥 पीडीएफ डाउनलोड", btn_dl_modal: "पीडीएफ डाउनलोड करें",
+                hdr_risk: "जोखिम संकेतक", lbl_feedback: "क्या यह विश्लेषण सटीक था?", btn_yes: "👍 हाँ", btn_no: "👎 नहीं", feedback_thanks: "आपकी प्रतिक्रिया के लिए धन्यवाद!",
+                hdr_history: "🕒 हाल का इतिहास", desc_history: "आपके पिछले 10 समाचार चेक यहां सहेजे गए हैं।", empty_history: "अभी तक कोई इतिहास नहीं है।",
+                hdr_analytics: "विश्लेषण अंतर्दृष्टि", hdr_sentiment: "भावना प्रोफ़ाइल", hdr_trust: "डोमेन विश्वसनीयता", hdr_readability: "पठनीयता मेट्रिक्स", lbl_wordcount: "शब्द गणना", lbl_avglen: "औसत शब्द लंबाई",
+                hdr_performance: "मॉडल प्रदर्शन डैशबोर्ड", hdr_global: "वैश्विक मेट्रिक्स", hdr_confusion: "कन्फ्यूजन मैट्रिक्स", hdr_arch: "मॉडल संरचना",
+                lbl_tr: "सत्य वास्तविक", lbl_ff: "झूठा नकली", lbl_fr: "झूठा वास्तविक", lbl_tf: "सत्य नकली",
+                desc_arch: "IntegrityAI V2.0 कस्टम सिमेंटिक वेट के साथ TF-IDF, PassiveAggressive और लॉजिस्टिक रिग्रेशन के स्टैक का लाभ उठाता है।",
+                hdr_admin: "प्लेटफॉर्म डेटा / ईडीए एडमिन", hdr_balance: "प्रशिक्षण डेटा संतुलन", hdr_keywords: "शीर्ष उभरते कीवर्ड",
+                modal_title: "विश्लेषण रिपोर्ट पूर्वावलोकन"
+            },
+            te: {
+                hero_title: "ఫేక్ న్యూస్‌ను అరికట్టండి<br><span style='color:var(--accent-primary)'>స్మార్ట్ AI</span>తో",
+                hero_desc: "IntegrityAI వార్త నిజమా కాదా అని తెలుసుకోవడానికి మీకు సహాయపడుతుంది. కేవలం ఒక లింక్ లేదా కొంత టెక్స్ట్‌ని పేస్ట్ చేయండి, మా స్మార్ట్ టూల్ వెంటనే దాన్ని తనిఖీ చేస్తుంది.",
+                nav_home: "హోమ్", nav_analyzer: "ప్రధాన అంచనా", nav_analytics: "విశ్లేషణ అంతర్దృష్టులు", nav_perf: "మోడల్ పనితీరు", nav_admin: "డేటా అడ్మిన్", nav_history: "ఇటీవలి చరిత్ర",
+                nav_theme: "థీమ్‌ను మార్చండి",
+                check_now: "ఇప్పుడే తనిఖీ చేయండి", see_works: "ఇది ఎలా పనిచేస్తుందో చూడండి",
+                lbl_precision: "నమూనా ఖచ్చితత్వం", lbl_analyzed: "విశ్లేషించిన కథనాలు", lbl_verified: "డేటా పాయింట్ల మూలం", val_verified: "ధృవీకరించబడింది",
+                hdr_analyzer: "నిజ-సమయ వార్తల విశ్లేషణ", news_placeholder: "తక్షణ ధృవీకరణ కోసం వార్తా కథనం టెక్స్ట్ లేదా లింక్ (https://...) ఇక్కడ పేస్ట్ చేయండి...",
+                lbl_charcount: "అక్షరాలు", btn_analyze: "ఇప్పుడు విశ్లేషించండి", loading_text: "AI కంటెంట్‌ను ప్రాసెస్ చేస్తోంది. దయచేసి వేచి ఉండండి...",
+                res_checked_on: "తనిఖీ చేసిన సమయం:", res_lang_label: "భాష: తెలుగు",
+                hdr_extracted: "🧾 సంగ్రహించిన కంటెంట్", hdr_summary: "విశ్లేషణ సారాంశం", lbl_conf: "విశ్వసనీయత స్కోరు",
+                btn_preview: "👁️ నివేదిక ప్రివ్యూ", btn_download: "📥 PDF డౌన్‌లోడ్", btn_dl_modal: "PDF డౌన్‌లోడ్ చేయండి",
+                hdr_risk: "ప్రమాద సూచికలు", lbl_feedback: "ఈ విశ్లేషణ ఖచ్చితంగా ఉందా?", btn_yes: "👍 అవును", btn_no: "👎 కాదు", feedback_thanks: "మీ అభిప్రాయానికి ధన్యవాదాలు!",
+                hdr_history: "🕒 ఇటీవలి చరిత్ర", desc_history: "మీ చివరి 10 వార్తల తనిఖీలు ఇక్కడ సేవ్ చేయబడతాయి.", empty_history: "చరిత్ర ఇంకా లేదు.",
+                hdr_analytics: "విశ్లేషణల అంతర్దృష్టులు", hdr_sentiment: "సెంటిమెంట్ ప్రొఫైల్", hdr_trust: "డొమైన్ విశ్వసనీయత", hdr_readability: "పఠనీయత కొలమానాలు", lbl_wordcount: "పద గణన", lbl_avglen: "సగటు పద పొడవు",
+                hdr_performance: "మోడల్ పనితీరు డాష్‌బోర్డ్", hdr_global: "ప్రపంచ కొలమానాలు", hdr_confusion: "గందరగోళ మ్యాట్రిక్స్", hdr_arch: "నమూనా నిర్మాణం",
+                lbl_tr: "నిజమైన వాస్తవం", lbl_ff: "తప్పుడు నకిలీ", lbl_fr: "తప్పుడు వాస్తవం", lbl_tf: "నిజమైన నకిలీ",
+                desc_arch: "IntegrityAI V2.0 అనుకూల సెమాంటిక్ వెయిట్‌లతో TF-IDF, PassiveAggressive మరియు లాజిస్టిక్ రిగ్రెషన్ స్టాక్‌ను ఉపయోగిస్తుంది.",
+                hdr_admin: "ప్లాట్‌ఫారమ్ డేటా / EDA అడ్మిన్", hdr_balance: "శిక్షణ డేటా సమతుల్యత", hdr_keywords: "ప్రముఖంగా ఉద్భవిస్తున్న కీలక పదాలు",
+                modal_title: "విశ్లేషణ నివేదిక ప్రివ్యూ"
+            }
+        };
 
-        // ---------- HISTORY ----------
-        function loadHistory() {
-            const history = JSON.parse(localStorage.getItem("analysisHistory") || "[]");
-            const list = document.getElementById("historyList");
-            if (history.length === 0) { list.innerHTML = `<div style="color:var(--muted); font-size:14px">No history yet</div>`; return; }
-            list.innerHTML = "";
-            history.forEach(item => {
-                const div = document.createElement("div");
-                div.className = "history-item";
-                div.innerHTML = `
-                    <span>${item.input.slice(0, 30)}${item.input.length > 30 ? '...' : ''}</span>
-                    <span class="badge ${item.prediction.toLowerCase()}" style="padding:2px 8px; font-size:10px">${item.prediction}</span>
-                `;
-                div.onclick = () => {
-                    document.getElementById("newsInput").value = item.input;
-                    if (item.fullData) displayResult(item.fullData);
-                }
-                list.appendChild(div);
-            });
+        // --- Multi-language ---
+        function changeLanguage() {
+            const lang = document.getElementById('langSelect').value;
+            const t = translations[lang];
+
+            // Navigation
+            document.querySelector('.nav-list .nav-item:nth-child(1) span').innerText = t.nav_home;
+            document.querySelector('.nav-list .nav-item:nth-child(2) span').innerText = t.nav_analyzer;
+            document.querySelector('.nav-list .nav-item:nth-child(3) span').innerText = t.nav_analytics;
+            document.querySelector('.nav-list .nav-item:nth-child(4) span').innerText = t.nav_perf;
+            document.querySelector('.nav-list .nav-item:nth-child(5) span').innerText = t.nav_admin;
+            document.querySelector('.nav-list .nav-item:nth-child(6) span').innerText = t.nav_history;
+            document.getElementById('nav_theme').innerText = t.nav_theme;
+
+            // Home Board
+            const h1 = document.getElementById('hero_title');
+            if (h1) h1.innerHTML = t.hero_title;
+            const p = document.getElementById('hero_desc');
+            if (p) p.innerText = t.hero_desc;
+            const btnPrimary = document.getElementById('btn_check_now');
+            if (btnPrimary) btnPrimary.innerText = t.check_now;
+            const btnSecondary = document.getElementById('btn_see_works');
+            if (btnSecondary) btnSecondary.innerText = t.see_works;
+            document.getElementById('lbl_precision').innerText = t.lbl_precision;
+            document.getElementById('lbl_analyzed').innerText = t.lbl_analyzed;
+            document.getElementById('lbl_verified').innerText = t.lbl_verified;
+            document.getElementById('val_verified').innerText = t.val_verified;
+
+            // Analyzer Board
+            document.getElementById('hdr_analyzer').innerText = t.hdr_analyzer;
+            document.getElementById('newsInput').placeholder = t.news_placeholder;
+            document.getElementById('btnText').innerText = t.btn_analyze;
+            document.getElementById('loadingText').innerText = t.loading_text;
+            document.getElementById('hdr_extracted').innerText = t.hdr_extracted;
+            document.getElementById('hdr_summary').innerText = t.hdr_summary;
+            document.getElementById('lbl_conf').innerText = t.lbl_conf;
+            document.getElementById('hdr_risk').innerText = t.hdr_risk;
+            document.getElementById('lbl_feedback').innerText = t.lbl_feedback;
+            document.getElementById('btn_yes').innerText = t.btn_yes;
+            document.getElementById('btn_no').innerText = t.btn_no;
+            document.getElementById('btn_preview').innerText = t.btn_preview;
+            document.getElementById('btn_download').innerText = t.btn_download;
+
+            // Dynamic labels in result
+            if (globalData) {
+                document.getElementById('resTimestamp').innerText = `${t.res_checked_on} ${globalData.timestamp}`;
+                document.getElementById('resLanguageLabel').innerText = t.res_lang_label;
+            }
+
+            // History Board
+            document.getElementById('hdr_history').innerText = t.hdr_history;
+            document.getElementById('desc_history').innerText = t.desc_history;
+            if (document.getElementById('empty_history')) document.getElementById('empty_history').innerText = t.empty_history;
+
+            // Analytics Board
+            document.getElementById('hdr_analytics').innerText = t.hdr_analytics;
+            document.getElementById('hdr_sentiment').innerText = t.hdr_sentiment;
+            document.getElementById('hdr_trust').innerText = t.hdr_trust;
+            document.getElementById('hdr_readability').innerText = t.hdr_readability;
+            document.getElementById('lbl_wordcount').innerText = t.lbl_wordcount;
+            document.getElementById('lbl_avglen').innerText = t.lbl_avglen;
+
+            // Performance Board
+            document.getElementById('hdr_performance').innerText = t.hdr_performance;
+            document.getElementById('hdr_global').innerText = t.hdr_global;
+            document.getElementById('hdr_confusion').innerText = t.hdr_confusion;
+            document.getElementById('hdr_arch').innerText = t.hdr_arch;
+            document.getElementById('desc_arch').innerText = t.desc_arch;
+            document.getElementById('lbl_tr').innerText = t.lbl_tr;
+            document.getElementById('lbl_ff').innerText = t.lbl_ff;
+            document.getElementById('lbl_fr').innerText = t.lbl_fr;
+            document.getElementById('lbl_tf').innerText = t.lbl_tf;
+
+            // Admin Board
+            document.getElementById('hdr_admin').innerText = t.hdr_admin;
+            document.getElementById('hdr_balance').innerText = t.hdr_balance;
+            document.getElementById('hdr_keywords').innerText = t.hdr_keywords;
+
+            // Modal
+            document.getElementById('modalTitle').innerText = t.modal_title;
+            document.getElementById('btn_dl_modal').innerText = t.btn_dl_modal;
+
+            // Update current char count label
+            updateCharCount();
         }
 
-        function saveHistory(input, data) {
-            let history = JSON.parse(localStorage.getItem("analysisHistory") || "[]");
-            history.unshift({
-                input,
-                prediction: data.prediction,
-                confidence: Math.round(data.confidence * 100),
-                fullData: data
+        function updateCharCount() {
+            const lang = document.getElementById('langSelect').value;
+            const count = document.getElementById('newsInput').value.length;
+            document.getElementById('charCount').innerText = `${count} ${translations[lang].lbl_charcount}`;
+        }
+
+        // Add event listener for char count
+        document.getElementById('newsInput').addEventListener('input', updateCharCount);
+
+        // --- Navigation ---
+        function switchBoard(boardId, event) {
+            document.querySelectorAll('.board').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            document.getElementById(boardId + '-board').classList.add('active');
+            if (event && event.currentTarget && event.currentTarget.classList.contains('nav-item')) {
+                event.currentTarget.classList.add('active');
+            } else {
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(boardId)) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            // Lazy load data
+            if (boardId === 'performance') loadModelStats();
+            if (boardId === 'admin') loadEDAStats();
+            if (boardId === 'analyzer') loadHistory();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light');
+        }
+
+        // --- Core Analysis Logic ---
+        async function runAnalysis() {
+            const input = document.getElementById('newsInput').value.trim();
+            if (!input) return alert("Please enter text or a URL.");
+
+            const btn = document.getElementById('analyzeBtn');
+            const loader = document.getElementById('loadingState');
+            const results = document.getElementById('resultsContainer');
+
+            btn.disabled = true;
+            loader.style.display = 'block';
+            results.style.display = 'none';
+
+            const lang = document.getElementById('langSelect').value;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: input,
+                        is_url: input.startsWith('http'),
+                        target_lang: lang
+                    })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                data.timestamp = new Date().toLocaleString();
+                globalData = data;
+                displayResult(data);
+                updateAnalyticsBoards(data);
+                saveHistory(input, data);
+
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                btn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+
+        function displayResult(data) {
+            const results = document.getElementById('resultsContainer');
+            results.style.display = 'block';
+
+            // Timestamps
+            document.getElementById('resTimestamp').innerText = `Checked on: ${data.timestamp || new Date().toLocaleString()}`;
+            document.getElementById('feedbackThanks').style.display = 'none';
+
+            // Handle Extracted Text
+            const extractedSection = document.getElementById('extractedSection');
+            const extractedText = document.getElementById('extractedTextDisplay');
+            if (data.extracted_text) {
+                extractedSection.style.display = 'block';
+                extractedText.innerText = data.extracted_text;
+            } else {
+                extractedSection.style.display = 'none';
+            }
+
+            const badge = document.getElementById('resBadge');
+            badge.textContent = data.prediction;
+            badge.className = 'badge ' + (data.prediction === 'Fake' ? 'badge-fake' : 'badge-real');
+
+            document.getElementById('resReason').innerText = data.reason;
+
+            const conf = Math.round(data.confidence * 100);
+            document.getElementById('resConfText').innerText = conf + '%';
+            document.getElementById('resMeter').style.width = conf + '%';
+
+            const expList = document.getElementById('resExplanation');
+            expList.innerHTML = '';
+            (data.explanation || []).forEach(e => {
+                const li = document.createElement('li');
+                li.style.padding = '10px 0';
+                li.style.borderBottom = '1px solid var(--card-border)';
+                li.innerHTML = `⚠️ <span style="margin-left:8px; font-size:0.9rem">${e}</span>`;
+                expList.appendChild(li);
             });
-            history = history.slice(0, 8);
-            localStorage.setItem("analysisHistory", JSON.stringify(history));
+
+            // Scroll to results
+            results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // --- History ---
+        function saveHistory(input, data) {
+            let history = JSON.parse(localStorage.getItem('integrity_history') || '[]');
+            history.unshift({ input, prediction: data.prediction, timestamp: data.timestamp, fullData: data });
+            localStorage.setItem('integrity_history', JSON.stringify(history.slice(0, 10)));
             loadHistory();
         }
 
-        // ---------- DISPLAY RESULTS ----------
-        function displayResult(data) {
-            document.getElementById("resultCard").style.display = "block";
-            document.getElementById("predictionBadge").textContent = data.prediction;
-            document.getElementById("predictionBadge").className = "badge " + (data.prediction === "Fake" ? "fake" : "real");
-
-            const conf = Math.round(data.confidence * 100);
-            document.getElementById("confidenceText").textContent = conf + "%";
-            document.getElementById("confidenceBar").style.width = conf + "%";
-
-            document.getElementById("modeText").textContent = data.mode;
-            document.getElementById("riskBadge").textContent = data.risk_level;
-            document.getElementById("riskBadge").className = "badge " + data.risk_level.toLowerCase();
-
-            // Summary / Reason
-            const summaryContainer = document.getElementById("summaryContainer");
-            if (data.reason) {
-                summaryContainer.style.display = "block";
-                document.getElementById("summaryText").textContent = data.reason;
-            } else {
-                summaryContainer.style.display = "none";
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('integrity_history') || '[]');
+            const list = document.getElementById('historyList');
+            if (history.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-secondary); font-size:0.9rem;">No history yet.</p>';
+                return;
             }
 
-            // Keywords
-            const keywordsContainer = document.getElementById("keywordsContainer");
-            const keywordsList = document.getElementById("keywordsList");
-            if (data.keywords && data.keywords.length > 0) {
-                keywordsContainer.style.display = "block";
-                keywordsList.innerHTML = data.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join("");
-            } else {
-                keywordsContainer.style.display = "none";
-            }
+            list.innerHTML = history.map((item, idx) => `
+                <div class="card" style="padding:15px; background:rgba(255,255,255,0.02); cursor:pointer;" onclick="viewHistoryItem(${idx})">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9rem; font-weight:600;">${item.input.slice(0, 40)}${item.input.length > 40 ? '...' : ''}</span>
+                        <span class="badge ${item.prediction === 'Fake' ? 'badge-fake' : 'badge-real'}" style="font-size:0.7rem;">${item.prediction}</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:5px;">${item.timestamp}</div>
+                </div>
+            `).join('');
+        }
 
-            const list = document.getElementById("explanationList");
-            list.innerHTML = "";
-            (data.explanation || []).forEach(e => {
-                const li = document.createElement("li"); li.textContent = e; list.appendChild(li)
+        function viewHistoryItem(idx) {
+            const history = JSON.parse(localStorage.getItem('integrity_history') || '[]');
+            const item = history[idx];
+            switchBoard('analyzer');
+            globalData = item.fullData;
+            displayResult(item.fullData);
+        }
+
+        // --- Feedback ---
+        function submitFeedback(isAccurate) {
+            document.getElementById('feedbackThanks').style.display = 'block';
+            console.log("User feedback received:", isAccurate);
+            // In a real app, you would fetch('/submit-feedback', { ... })
+        }
+
+        function updateAnalyticsBoards(data) {
+            // Sentiment
+            renderChart('sentimentChart', 'doughnut', {
+                labels: ['Positive', 'Negative', 'Neutral'],
+                datasets: [{
+                    data: [data.sentiment.label === 'Positive' ? 1 : 0, data.sentiment.label === 'Negative' ? 1 : 0, data.sentiment.label === 'Neutral' ? 1 : 0],
+                    backgroundColor: ['#10b981', '#ef4444', '#64748b']
+                }]
             });
 
-            const ctx = document.getElementById("confidenceChart");
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: "doughnut",
-                data: {
-                    labels: ["Real", "Fake"],
-                    datasets: [{
-                        data: [conf, 100 - conf],
-                        backgroundColor: ["#22c55e", "#ef4444"],
-                        borderWidth: 0
-                    }]
-                },
+            // Trust
+            renderChart('trustChart', 'bar', {
+                labels: ['Confidence'],
+                datasets: [{
+                    label: 'Trust Score',
+                    data: [data.trust.score],
+                    backgroundColor: data.trust.score > 70 ? '#10b981' : '#f59e0b'
+                }]
+            }, { indexAxis: 'y', scales: { x: { max: 100 } } });
+
+            // Stats
+            document.getElementById('wordCount').innerText = data.stats.word_count;
+            document.getElementById('avgWordLen').innerText = data.stats.avg_word_length;
+        }
+
+        async function loadModelStats() {
+            const res = await fetch('/model-stats');
+            const data = await res.json();
+
+            renderChart('perfMetricsChart', 'radar', {
+                labels: ['Accuracy', 'Precision', 'Recall', 'F1'],
+                datasets: [{
+                    label: 'V2.0 Core',
+                    data: [data.accuracy, data.precision, data.recall, data.f1],
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                    borderColor: 'var(--accent-primary)',
+                    pointBackgroundColor: 'var(--accent-primary)'
+                }]
+            }, { scales: { r: { min: 0.8, max: 1 } } });
+
+            document.getElementById('tp_val').innerText = data.confusion_matrix.tp;
+            document.getElementById('fp_val').innerText = data.confusion_matrix.fp;
+            document.getElementById('fn_val').innerText = data.confusion_matrix.fn;
+            document.getElementById('tn_val').innerText = data.confusion_matrix.tn;
+        }
+
+        async function loadEDAStats() {
+            const res = await fetch('/eda-stats');
+            const data = await res.json();
+
+            renderChart('distChart', 'pie', {
+                labels: ['Real', 'Fake'],
+                datasets: [{
+                    data: [data.label_distribution.Real, data.label_distribution.Fake],
+                    backgroundColor: ['#10b981', '#ef4444']
+                }]
+            });
+
+            const cloud = document.getElementById('keywordCloud');
+            cloud.innerHTML = '';
+            data.top_keywords.forEach(k => {
+                const span = document.createElement('span');
+                span.className = 'badge';
+                span.style.background = 'rgba(99, 102, 241, 0.1)';
+                span.style.color = 'var(--accent-primary)';
+                span.style.fontSize = (0.7 + (k.value / 200)) + 'rem';
+                span.style.border = '1px solid var(--accent-primary)';
+                span.innerText = k.text;
+                cloud.appendChild(span);
+            });
+        }
+
+        // --- Helpers ---
+        function renderChart(id, type, data, options = {}) {
+            if (charts[id]) charts[id].destroy();
+            const ctx = document.getElementById(id).getContext('2d');
+            charts[id] = new Chart(ctx, {
+                type,
+                data,
                 options: {
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    cutout: '70%'
+                    responsive: true,
+                    plugins: { legend: { display: type !== 'bar', labels: { color: '#94a3b8' } } },
+                    ...options
                 }
             });
-
-            // Scroll to result
-            document.getElementById("resultCard").scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // ---------- ANALYZE ----------
-        async function analyze() {
-            const text = document.getElementById("newsInput").value.trim();
-            if (!text) return alert("Please enter some text or a URL to analyze.");
+        function previewReport() {
+            if (!globalData) return;
+            const modal = document.getElementById('reportModal');
+            const body = document.getElementById('modalBody');
 
-            // UI State: Loading
-            const loadingCard = document.getElementById("loadingCard");
-            const resultCard = document.getElementById("resultCard");
-            const extractedCard = document.getElementById("extractedCard");
-            const btn = document.getElementById("analyzeBtn");
-
-            loadingCard.style.display = "block";
-            resultCard.style.display = "none";
-            extractedCard.style.display = "none";
-            btn.disabled = true;
-            btn.innerHTML = "<span>Analyzing...</span>";
-
-            try {
-                const res = await fetch("/predict", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text, is_url: isURL(text) })
-                });
-
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-
-                if (data.extracted_text) {
-                    extractedCard.style.display = "block";
-                    document.getElementById("extractedText").textContent = data.extracted_text;
-                }
-
-                displayResult(data);
-                saveHistory(text, data);
-
-            } catch (err) {
-                alert(err.message || "An error occurred during analysis.");
-            } finally {
-                loadingCard.style.display = "none";
-                btn.disabled = false;
-                btn.innerHTML = "<span>Analyze Content</span>";
-            }
+            body.innerHTML = `
+                <div style="font-family:'Outfit'; text-align:center; margin-bottom:30px">
+                    <h2 style="color:var(--accent-primary)">INTEGRITY AI ANALYSIS</h2>
+                    <p style="color:var(--text-secondary)">Official Verification Report</p>
+                </div>
+                <div style="border-left:4px solid var(--accent-primary); padding-left:20px; margin-bottom:20px">
+                    <h3>Prediction: ${globalData.prediction}</h3>
+                    <p style="color:var(--text-secondary)">Confidence: ${Math.round(globalData.confidence * 100)}%</p>
+                </div>
+                <p><b>Summary:</b> ${globalData.reason}</p>
+                <div style="margin-top:20px">
+                    <b>Risk Factors Identified:</b>
+                    <ul style="margin-top:10px; padding-left:20px">
+                        ${globalData.explanation.map(e => `<li>${e}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            modal.style.display = 'flex';
         }
 
-        // ---------- DOWNLOADS ----------
-        function downloadTXT() {
-            const t = `Prediction: ${document.getElementById("predictionBadge").textContent}\nConfidence: ${document.getElementById("confidenceText").textContent}`;
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(new Blob([t]));
-            a.download = "result.txt"; a.click();
+        function closeModal() {
+            document.getElementById('reportModal').style.display = 'none';
         }
-        function downloadChart() {
-            const a = document.createElement("a");
-            a.href = document.getElementById("confidenceChart").toDataURL();
-            a.download = "chart.png"; a.click();
-        }
-        async function downloadPDF() {
-            const canvas = document.getElementById("confidenceChart");
+
+        async function downloadReport() {
+            if (!globalData) return;
             const payload = {
-                prediction: document.getElementById("predictionBadge").textContent,
-                confidence: parseInt(document.getElementById("confidenceText").textContent) / 100,
-                mode: document.getElementById("modeText").textContent,
-                risk_level: document.getElementById("riskBadge").textContent,
-                chart: canvas.toDataURL()
+                prediction: globalData.prediction,
+                confidence: globalData.confidence,
+                mode: globalData.mode,
+                reason: globalData.reason,
+                risk_level: globalData.risk_level,
+                sentiment: globalData.sentiment,
+                stats: globalData.stats
             };
-            const res = await fetch("/download-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+            const res = await fetch('/download-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
             const blob = await res.blob();
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob); a.download = "report.pdf"; a.click();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `integrity_report_${Date.now()}.pdf`;
+            a.click();
         }
 
-        loadHistory();
+        // --- Init ---
+        document.getElementById('newsInput').addEventListener('input', (e) => {
+            document.getElementById('charCount').innerText = e.target.value.length + ' characters';
+        });
+
+        // Toggle spin animation via JS injection for simplicity
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+        document.head.appendChild(style);
+
     </script>
 </body>
 
